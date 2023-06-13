@@ -1,7 +1,7 @@
 v2 playerP;
 int playerGridPX, playerGridPY;
 v2 playerDP;
-f32 playerAngle;
+f32 playerAngle = 1.2;
 f32 speed = 75, accel = 1.26;
 int framesToMove = 0, framesToMoveBack = 0;
 int playerSize = 40;
@@ -16,7 +16,7 @@ f64 rayX, rayY, rayAngle, xOffset, yOffset, distance;
 int xO, yO;
 int xReach, yReach;
 int renderDistance = 16;
-int fogDist = 288;
+int fogDist = 512;
 f32 bobbing = 0;
 b32 stepped = false;
 
@@ -106,11 +106,13 @@ SimulateGame(Input *input, f32 dt){
                 mapWalls[playerGridPX + (int)(mapY - (playerP.y + yReach)/64) * mapX] = 0; 
             }
         }
-    } else if (mainMenuState){
+    }
+    
+    if (mainMenuState){
         playerP.x = 70.5*mapS;
         playerP.y = 60.5*mapS;
         
-        playerAngle += dt/4;
+        playerAngle += dt/6;
         
         if (Pressed(BUTTON_INTERACT)) {
             playerAngle = 0;
@@ -123,7 +125,6 @@ SimulateGame(Input *input, f32 dt){
             mainMenuState = false; gameState = true;
         }
     }
-    
     
     ClearScreen(0xb1b1b1);
     
@@ -252,9 +253,8 @@ SimulateGame(Input *input, f32 dt){
             f32 textureX = playerP.x/2 + cos(rayAngle)*404*32/dy/rAFix;
             f32 textureY = (mapS * mapY - playerP.y)/2 - sin(rayAngle)*404*32/dy/rAFix;
             f32 floorD =  dist(playerP.x/2, (mapY*32 - playerP.y/2), textureX, textureY, rayAngle);
-            f32 shade = (1 - floorD*floorD/(fogDist*fogDist/4)) * 0.4;;
-            if (shade > 1) shade = 1;
-            if (shade < 0) shade = 0;
+            f32 shade = (1 - floorD / fogDist * 2) * (1 - floorD / fogDist * 2) * 0.4;//(1 - floorD*floorD/(fogDist*fogDist/4)) * 0.4;
+            if (shade < 0 || floorD * 2 >= fogDist) shade = 0;
             
             int mapValue;
             if ((int)(textureX/32.0) >= mapX || (int)(textureY/32.0) >= mapY || (int)(textureX/32.0) < 0 || (int)(textureY/32.0) < 0){
@@ -301,9 +301,8 @@ SimulateGame(Input *input, f32 dt){
         if (distance != 727727) lineHeight = (mapS * maxLineHeight)/distance;
         f32 tYStep = 32.0/(f32)lineHeight;
         f32 tYOffset = 0;
-        f32 shade = (1 - distance*distance/(fogDist*fogDist)) * 0.5;
-        if (shade > 1) shade = 1;
-        if (shade < 0) shade = 0;
+        f32 shade = (1 - distance / fogDist) * (1 - distance / fogDist) * 0.5;//(1 - distance*distance/(fogDist*fogDist)) * 0.5;
+        if (shade < 0 || distance >= fogDist) shade = 0;
         
         if (lineHeight > maxLineHeight) { tYOffset = (lineHeight - maxLineHeight) / 2.0; lineHeight = maxLineHeight; }
         f32 lineOffset = (maxLineHeight - lineHeight)/2 - 110 + sin(bobbing) * 3;
@@ -340,8 +339,12 @@ SimulateGame(Input *input, f32 dt){
     
     DrawSprites(playerP, playerAngle, fogDist, dt, bobbing);
     
-    int i;
-    for(i = 0; i < hp; i++){
-        DrawRectInPixels(10 + i*40, 10, 40 + i*40, 40, 0xff0000);
+    if (mainMenuState){
+        DrawOnScreen(credits, 358, 64, 20, 520, 1);
+        DrawOnScreen(title, 234, 72, 363, 100, 1);
+        if ((int)(playerAngle*8)%3)DrawOnScreen(start, 640, 48, 160, 380, 1);
     }
+    
+    //int i;
+    //for(i = 0; i < hp; i++) DrawRectInPixels(10 + i*40, 10, 40 + i*40, 40, 0xff0000);
 };

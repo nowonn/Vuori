@@ -39,6 +39,25 @@ DrawMap(){
 }
 
 internal void
+DrawOnScreen(int imageMap[], int imgW, int imgH, int startingX, int startingY, f32 shade){
+    int imgX, imgY;
+    for (imgY = 0; imgY < imgH; imgY++){
+        for (imgX = 0; imgX < imgW; imgX++){
+            int pixel = (imgY*imgW + imgX) * 3;
+            int red = imageMap[pixel] * shade;
+            int green = imageMap[pixel + 1] * shade;
+            int blue = imageMap[pixel + 2] * shade;
+            
+            u32 color = createRGB(red, green, blue);
+            
+            if (color != 0xff00ff) DrawRectInPixels(startingX + imgX, startingY + imgY,
+                                                    startingX + imgX + 1, startingY + imgY + 1,
+                                                    color);
+        }
+    }
+}
+
+internal void
 DrawSprites(v2 playerP, f32 playerAngle, int fogDist, f32 dt, f32 bobbing){
     int x, y, sprite;
     b32 isTransparent = false;
@@ -115,9 +134,8 @@ DrawSprites(v2 playerP, f32 playerAngle, int fogDist, f32 dt, f32 bobbing){
         {
             for(x = spriteX - scale/2; x < spriteX + scale/2; x++){
                 textureY = 31;
-                f32 shade = (1 - b*b/(fogDist*fogDist)) * 0.5;
-                if (shade > 1) shade = 1;
-                if (shade < 0) shade = 0;
+                f32 shade = (1 - b / fogDist) * (1 - b / fogDist) * 0.5;
+                if (shade < 0 || b >= fogDist) shade = 0;
                 for(y = 0; y < scale; y++){
                     if (x > 0 && x < 120 && b < depth[x]){
                         isTransparent = false;

@@ -1,8 +1,10 @@
 /*
 TO-DO LIST
-- UI
+- SPRITE DRAW ORDER
+- DMG INDICATOR
 - BETTER DOORS
 - MORE PORTALS (NOT KEYS)
+- include audio in .exe
 - more level design
 */
 
@@ -30,6 +32,9 @@ TO-DO LIST
 #include "assets/textures.ppm"
 #include "assets/sky.ppm"
 #include "assets/sprites.ppm"
+#include "assets/credits.ppm"
+#include "assets/title.ppm"
+#include "assets/press_to_start.ppm"
 
 struct {
     int width, height;
@@ -45,7 +50,6 @@ ma_engine engine;
 #include "createsprites.c"
 #include "software_rendering.c"
 #include "game.c"
-#include "mainmenu.c"
 
 #define fps 60
 #define frameDelay (1000 / fps)
