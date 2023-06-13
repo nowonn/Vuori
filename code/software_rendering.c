@@ -1,6 +1,7 @@
 int redAmount;
 b32 tookDmg;
 u32 screenColor;
+int FOV = 66;
 
 internal void
 ClearScreen(u32 color){
@@ -58,7 +59,7 @@ DrawOnScreen(int imageMap[], int imgW, int imgH, int startingX, int startingY, f
 }
 
 internal void
-DrawSprites(v2 playerP, f32 playerAngle, int fogDist, f32 dt, f32 bobbing){
+DrawSprites(v2 playerP, f32 playerAngle, int fogDist, f32 dt, f32 bobbing, f32 brightness){
     int x, y, sprite;
     b32 isTransparent = false;
     
@@ -98,9 +99,9 @@ DrawSprites(v2 playerP, f32 playerAngle, int fogDist, f32 dt, f32 bobbing){
             if (sp[sprite].y < playerP.y && mapWalls[gridYPlus * mapX + gridX] == 0) sp[sprite].y += (playerP.y - sp[sprite].y) / (1 + abs(dist(sp[sprite].x, sp[sprite].y, playerP.x, playerP.y, 0))) * dt * 125;
             if (playerP.x < sp[sprite].x + 20 && playerP.x > sp[sprite].x - 20 && playerP.y < sp[sprite].y + 20 && playerP.y > sp[sprite].y - 20 && !tookDmg) {
                 hp--;
-                tookDmg = true;
-                redAmount = 255;
-                screenColor = 0xff0000;
+                //tookDmg = true;
+                //redAmount = 255;
+                //screenColor = 0xff0000;
                 sp[sprite].exists = 0;
                 if (hp < 1) running = false;
             }
@@ -134,7 +135,7 @@ DrawSprites(v2 playerP, f32 playerAngle, int fogDist, f32 dt, f32 bobbing){
         {
             for(x = spriteX - scale/2; x < spriteX + scale/2; x++){
                 textureY = 31;
-                f32 shade = (1 - b / fogDist) * (1 - b / fogDist) * 0.5;
+                f32 shade = (1 - b / fogDist) * (1 - b / fogDist) * brightness;
                 if (shade < 0 || b >= fogDist) shade = 0;
                 for(y = 0; y < scale; y++){
                     if (x > 0 && x < 120 && b < depth[x]){

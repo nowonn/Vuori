@@ -1,9 +1,9 @@
 /*
 TO-DO LIST
 - SPRITE DRAW ORDER
-- DMG INDICATOR
 - BETTER DOORS
 - MORE PORTALS (NOT KEYS)
+- better DMG INDICATOR
 - include audio in .exe
 - more level design
 */
@@ -178,7 +178,6 @@ input.buttons[b].isDown = isDown;\
         
         //Simulation
         SimulateGame(&input, lastDt);
-        //if (mainMenuState) MainMenu(&input);
         
         //Render
         StretchDIBits(hdc, 0, 0, renderBuffer.width, renderBuffer.height, 0, 0, renderBuffer.width, renderBuffer.height, renderBuffer.pixels, &renderBuffer.bitmapInfo, DIB_RGB_COLORS, SRCCOPY);

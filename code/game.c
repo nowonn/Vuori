@@ -8,7 +8,6 @@ int playerSize = 40;
 
 u32 wallColor;
 f32 maxLineHeight = 820;
-int FOV = 66;
 int lineWidth = 8;
 int rayAmount;
 int ray, mx, my, mp, dof;
@@ -19,6 +18,7 @@ int renderDistance = 16;
 int fogDist = 512;
 f32 bobbing = 0;
 b32 stepped = false;
+f32 brightness = 0.6;
 
 internal void
 SimulateGame(Input *input, f32 dt){
@@ -253,7 +253,7 @@ SimulateGame(Input *input, f32 dt){
             f32 textureX = playerP.x/2 + cos(rayAngle)*404*32/dy/rAFix;
             f32 textureY = (mapS * mapY - playerP.y)/2 - sin(rayAngle)*404*32/dy/rAFix;
             f32 floorD =  dist(playerP.x/2, (mapY*32 - playerP.y/2), textureX, textureY, rayAngle);
-            f32 shade = (1 - floorD / fogDist * 2) * (1 - floorD / fogDist * 2) * 0.4;//(1 - floorD*floorD/(fogDist*fogDist/4)) * 0.4;
+            f32 shade = (1 - floorD / fogDist * 2) * (1 - floorD / fogDist * 2) * brightness * 0.8;
             if (shade < 0 || floorD * 2 >= fogDist) shade = 0;
             
             int mapValue;
@@ -301,7 +301,7 @@ SimulateGame(Input *input, f32 dt){
         if (distance != 727727) lineHeight = (mapS * maxLineHeight)/distance;
         f32 tYStep = 32.0/(f32)lineHeight;
         f32 tYOffset = 0;
-        f32 shade = (1 - distance / fogDist) * (1 - distance / fogDist) * 0.5;//(1 - distance*distance/(fogDist*fogDist)) * 0.5;
+        f32 shade = (1 - distance / fogDist) * (1 - distance / fogDist) * brightness;
         if (shade < 0 || distance >= fogDist) shade = 0;
         
         if (lineHeight > maxLineHeight) { tYOffset = (lineHeight - maxLineHeight) / 2.0; lineHeight = maxLineHeight; }
@@ -337,12 +337,19 @@ SimulateGame(Input *input, f32 dt){
         if (rayAngle >= 2 * PI) rayAngle -= 2 * PI;
     }
     
-    DrawSprites(playerP, playerAngle, fogDist, dt, bobbing);
+    DrawSprites(playerP, playerAngle, fogDist, dt, bobbing, brightness);
     
     if (mainMenuState){
         DrawOnScreen(credits, 358, 64, 20, 520, 1);
         DrawOnScreen(title, 234, 72, 363, 100, 1);
         if ((int)(playerAngle*8)%3)DrawOnScreen(start, 640, 48, 160, 380, 1);
+    }
+    
+    if (hp < 3){
+        //DrawRectInPixels(0, 0, 960, 50 * (3 - hp), 0);
+        DrawRectInPixels(0, 0, 80 * (3 - hp), 640, 0);
+        DrawRectInPixels(960 - 80 * (3 - hp) - 15, 0, 960, 640, 0);
+        //DrawRectInPixels(0, 640 - 50 * (3 - hp) - 40, 960, 640, 0);
     }
     
     //int i;
