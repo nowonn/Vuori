@@ -26,7 +26,7 @@ SimulateGame(Input *input, f32 dt){
     
     if (gameState){
         if (!IsDown(BUTTON_SPRINT)) speed = 50;
-        else speed = 100;
+        else speed = 75;
         
         if (IsDown(BUTTON_LEFT) || Pressed(BUTTON_LEFT)) {
             playerAngle += 2 * dt;
@@ -71,8 +71,10 @@ SimulateGame(Input *input, f32 dt){
                 playerP.y += playerDP.y * dt * speed * pow(accel, framesToMove);
             }
             
-            if (sin(bobbing) < -0.85 && !stepped) {
-                ma_engine_play_sound(&engine, "grassstep.mp3", NULL);
+            if (sin(bobbing) < -0.80 && !stepped) {
+                if (mapFloor[playerGridPY * mapX + (int)((playerP.x)/64)] == 1)
+                    ma_engine_play_sound(&engine, "grassstep.mp3", NULL);
+                else ma_engine_play_sound(&engine, "concrete.mp3", NULL);
                 stepped = true;
             }
             
@@ -87,8 +89,10 @@ SimulateGame(Input *input, f32 dt){
                 playerP.y -= playerDP.y * dt * speed * pow(accel, framesToMoveBack);
             }
             
-            if (sin(bobbing) < -0.85 && !stepped) {
-                ma_engine_play_sound(&engine, "grassstep.mp3", NULL);
+            if (sin(bobbing) < -0.80 && !stepped) {
+                if (mapFloor[playerGridPY * mapX + (int)((playerP.x)/64)] == 1)
+                    ma_engine_play_sound(&engine, "grassstep.mp3", NULL);
+                else ma_engine_play_sound(&engine, "concrete.mp3", NULL);
                 stepped = true;
             }
             
@@ -101,9 +105,11 @@ SimulateGame(Input *input, f32 dt){
             
             if (mapWalls[playerGridPY * mapX + (int)((playerP.x + xReach)/64)] == 7) {
                 mapWalls[playerGridPY * mapX + (int)((playerP.x + xReach)/64)] = 0; 
+                ma_engine_play_sound(&engine, "door.mp3", NULL);
             }
             if (mapWalls[playerGridPX + (int)(mapY - (playerP.y + yReach)/64) * mapX] == 7) {
                 mapWalls[playerGridPX + (int)(mapY - (playerP.y + yReach)/64) * mapX] = 0; 
+                ma_engine_play_sound(&engine, "door.mp3", NULL);
             }
         }
     }
@@ -113,6 +119,11 @@ SimulateGame(Input *input, f32 dt){
         playerP.y = 60.5*mapS;
         
         playerAngle += dt/6;
+        
+        if (Pressed(BUTTON_UP) && brightness < 1) brightness += 0.1;
+        if (Pressed(BUTTON_DOWN) && brightness >= 0.1) brightness -= 0.1;
+        if (Pressed(BUTTON_RIGHT)) fogDist += 64;
+        if (Pressed(BUTTON_LEFT)) fogDist -= 64;
         
         if (Pressed(BUTTON_INTERACT)) {
             playerAngle = 0;
@@ -149,7 +160,7 @@ SimulateGame(Input *input, f32 dt){
     if (rayAngle < 0) rayAngle += 2 * PI;
     if (rayAngle >= 2 * PI) rayAngle -= 2 * PI;
     
-    for(ray = 0; ray < rayAmount; ray++){
+    for(ray = 0; ray < rayAmount; ray++){// for each ray:
         int vMapTexture = 0, hMapTexture = 0;
         
         dof = 0; //Check for rays that collide with the horizontal parts of the wall
@@ -183,8 +194,8 @@ SimulateGame(Input *input, f32 dt){
             if (mp > 0 && mp < mapX*mapY && mapWalls[mp] > 0) {
                 hMapTexture = mapWalls[mp] - 1;
                 dof = renderDistance;
-                hX = rayX;
-                hY = rayY;
+                if (mapWalls[mp] == 7){ rayX += xOffset/3; rayY += yOffset/3; }
+                hX = rayX; hY = rayY;
                 distH = dist(playerP.x, playerP.y, hX, hY, rayAngle);
             }
             else {
@@ -227,8 +238,8 @@ SimulateGame(Input *input, f32 dt){
             if (mp > 0 && mp < mapX*mapY && mapWalls[mp] > 0) {
                 vMapTexture = mapWalls[mp] - 1;
                 dof = renderDistance;
-                vX = rayX;
-                vY = rayY;
+                if (mapWalls[mp] == 7){ rayX += xOffset/3; rayY += yOffset/3; }
+                vX = rayX; vY = rayY;
                 distV = dist(playerP.x, playerP.y, vX, vY, rayAngle);
             }
             else {
@@ -342,13 +353,13 @@ SimulateGame(Input *input, f32 dt){
     if (mainMenuState){
         DrawOnScreen(credits, 358, 64, 20, 520, 1);
         DrawOnScreen(title, 234, 72, 363, 100, 1);
-        if ((int)(playerAngle*8)%3)DrawOnScreen(start, 640, 48, 160, 380, 1);
+        if ((int)(playerAngle*8)%3) DrawOnScreen(start, 640, 48, 160, 380, 1);
     }
     
     if (hp < 3){
         //DrawRectInPixels(0, 0, 960, 50 * (3 - hp), 0);
-        DrawRectInPixels(0, 0, 80 * (3 - hp), 640, 0);
-        DrawRectInPixels(960 - 80 * (3 - hp) - 15, 0, 960, 640, 0);
+        DrawRectInPixels(0, 0, 120 * (3 - hp), 640, 0);
+        DrawRectInPixels(960 - 120 * (3 - hp) - 15, 0, 960, 640, 0);
         //DrawRectInPixels(0, 640 - 50 * (3 - hp) - 40, 960, 640, 0);
     }
     

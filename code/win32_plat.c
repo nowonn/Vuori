@@ -1,11 +1,10 @@
 /*
 TO-DO LIST
 - SPRITE DRAW ORDER
-- BETTER DOORS
-- MORE PORTALS (NOT KEYS)
-- better DMG INDICATOR
+- MORE LEVELS AND PORTALS
+- dmg animation
+- door animations
 - include audio in .exe
-- more level design
 */
 
 #include <stdio.h>

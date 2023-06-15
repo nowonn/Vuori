@@ -86,32 +86,6 @@ DrawSprites(v2 playerP, f32 playerAngle, int fogDist, f32 dt, f32 bobbing, f32 b
                 sp[sprite].exists = false;
             }
         }
-        if (sp[sprite].type == 2 && sp[sprite].exists == 1) {
-            int gridX = (int)sp[sprite].x >> 6, gridY = mapY - 1 - ((int)sp[sprite].y >> 6);
-            int gridXPlus = ((int)sp[sprite].x + 5) >> 6;
-            int gridYPlus = mapY - 1 - (((int)sp[sprite].y + 5) >> 6);
-            int gridXMinus = ((int)sp[sprite].x - 5) >> 6;
-            int gridYMinus = mapY - 1 - (((int)sp[sprite].y - 5) >> 6);
-            
-            if (sp[sprite].x > playerP.x && mapWalls[gridY * mapX + gridXMinus] == 0) sp[sprite].x -= (sp[sprite].x - playerP.x) / (1 + abs(dist(sp[sprite].x, sp[sprite].y, playerP.x, playerP.y, 0))) * dt * 125;
-            if (sp[sprite].x < playerP.x && mapWalls[gridY * mapX + gridXPlus] == 0) sp[sprite].x += (playerP.x - sp[sprite].x) / (1 + abs(dist(sp[sprite].x, sp[sprite].y, playerP.x, playerP.y, 0))) * dt * 125;
-            if (sp[sprite].y > playerP.y && mapWalls[gridYMinus * mapX + gridX] == 0) sp[sprite].y -= (sp[sprite].y - playerP.y) / (1 + abs(dist(sp[sprite].x, sp[sprite].y, playerP.x, playerP.y, 0))) * dt * 125;
-            if (sp[sprite].y < playerP.y && mapWalls[gridYPlus * mapX + gridX] == 0) sp[sprite].y += (playerP.y - sp[sprite].y) / (1 + abs(dist(sp[sprite].x, sp[sprite].y, playerP.x, playerP.y, 0))) * dt * 125;
-            if (playerP.x < sp[sprite].x + 20 && playerP.x > sp[sprite].x - 20 && playerP.y < sp[sprite].y + 20 && playerP.y > sp[sprite].y - 20 && !tookDmg) {
-                hp--;
-                //tookDmg = true;
-                //redAmount = 255;
-                //screenColor = 0xff0000;
-                sp[sprite].exists = 0;
-                if (hp < 1) running = false;
-            }
-            
-            if (tookDmg){
-                DrawRectInPixels(0, 0, 960, 640, screenColor);
-                screenColor = createRGB(redAmount--, 0, 0);
-                if (redAmount == 0) tookDmg = false;
-            }
-        }
         
         f32 spriteX = sp[sprite].x - playerP.x;
         f32 spriteY = sp[sprite].y - playerP.y;
@@ -131,7 +105,7 @@ DrawSprites(v2 playerP, f32 playerAngle, int fogDist, f32 dt, f32 bobbing, f32 b
         
         f32 textureX = 31.5, textureY = 31, xStep = 32/scale, yStep = 32/scale;
         
-        if (spriteX >= 0 && spriteX <= 480 && spriteY >= 0 && spriteY <= 240 && sp[sprite].exists == 1)
+        if (spriteX >= 0 && spriteX <= 130 && spriteY >= 0 && spriteY <= 240 && sp[sprite].exists == 1)
         {
             for(x = spriteX - scale/2; x < spriteX + scale/2; x++){
                 textureY = 31;
@@ -155,10 +129,29 @@ DrawSprites(v2 playerP, f32 playerAngle, int fogDist, f32 dt, f32 bobbing, f32 b
                                              (spriteY + 1 - y) * 8 + sin(bobbing) * 3,
                                              color);
                         textureY -= yStep; if (textureY < 0) textureY = 0;
-                    } 
+                    }
                 }
                 
                 textureX -= xStep; if (textureX < 0) textureX = 0;
+            }
+            
+            if (sp[sprite].type == 2 && sp[sprite].exists == 1) {
+                int gridX = (int)sp[sprite].x >> 6, gridY = mapY - 1 - ((int)sp[sprite].y >> 6);
+                int gridXPlus = ((int)sp[sprite].x + 5) >> 6;
+                int gridYPlus = mapY - 1 - (((int)sp[sprite].y + 5) >> 6);
+                int gridXMinus = ((int)sp[sprite].x - 5) >> 6;
+                int gridYMinus = mapY - 1 - (((int)sp[sprite].y - 5) >> 6);
+                
+                if (sp[sprite].x > playerP.x && mapWalls[gridY * mapX + gridXMinus] == 0) sp[sprite].x -= (sp[sprite].x - playerP.x) / (1 + abs(dist(sp[sprite].x, sp[sprite].y, playerP.x, playerP.y, 0))) * dt * 125;
+                if (sp[sprite].x < playerP.x && mapWalls[gridY * mapX + gridXPlus] == 0) sp[sprite].x += (playerP.x - sp[sprite].x) / (1 + abs(dist(sp[sprite].x, sp[sprite].y, playerP.x, playerP.y, 0))) * dt * 125;
+                if (sp[sprite].y > playerP.y && mapWalls[gridYMinus * mapX + gridX] == 0) sp[sprite].y -= (sp[sprite].y - playerP.y) / (1 + abs(dist(sp[sprite].x, sp[sprite].y, playerP.x, playerP.y, 0))) * dt * 125;
+                if (sp[sprite].y < playerP.y && mapWalls[gridYPlus * mapX + gridX] == 0) sp[sprite].y += (playerP.y - sp[sprite].y) / (1 + abs(dist(sp[sprite].x, sp[sprite].y, playerP.x, playerP.y, 0))) * dt * 125;
+                if (playerP.x < sp[sprite].x + 20 && playerP.x > sp[sprite].x - 20 && playerP.y < sp[sprite].y + 20 && playerP.y > sp[sprite].y - 20 && !tookDmg) {
+                    hp--;
+                    ma_engine_play_sound(&engine, "ghost.mp3", NULL);
+                    sp[sprite].exists = 0;
+                    if (hp < 1) running = false;
+                }
             }
         }
     }
