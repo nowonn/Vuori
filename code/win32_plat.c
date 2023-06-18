@@ -14,10 +14,7 @@ TO-DO LIST
 #include "utils.c"
 #include "math.c"
 #include "platform_common.c"
-
-#define MINIAUDIO_IMPLEMENTATION
-#include "miniaudio.h"
-
+#include "audio.h"
 #include "maps/Walls1.map"
 #include "maps/Walls2.map"
 #include "maps/Walls3.map"
@@ -42,9 +39,6 @@ struct {
 } typedef RenderBuffer;
 
 global_variable RenderBuffer renderBuffer;
-
-ma_result result;
-ma_engine engine;
 
 #include "createsprites.c"
 #include "software_rendering.c"
@@ -132,7 +126,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     sp[397].type = 2; sp[397].exists = true; sp[397].texture = 2; sp[397].x = 113.5 * mapS;sp[397].y = 3.5 * mapS; sp[397].z = 10; sp[397].size = 32;
     //sp[b].type = 2; sp[b].exists = true; sp[b].texture = 2; sp[b].x = 18.5 * mapS;sp[b].y = 124.5 * mapS; sp[b].z = 10; sp[b].size = 32;
     
-    result = ma_engine_init(NULL, &engine); //Init audio engine
+    ma_result result = ma_engine_init(NULL, &engine); //Init audio engine
     if (result != MA_SUCCESS) {
         printf("Failed to initialize audio engine.");
         return -1;

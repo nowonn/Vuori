@@ -73,8 +73,8 @@ SimulateGame(Input *input, f32 dt){
             
             if (sin(bobbing) < -0.80 && !stepped) {
                 if (mapFloor[playerGridPY * mapX + (int)((playerP.x)/64)] == 1)
-                    ma_engine_play_sound(&engine, "grassstep.mp3", NULL);
-                else ma_engine_play_sound(&engine, "concrete.mp3", NULL);
+                    PlayAudio(grassstep);
+                else PlayAudio(concrete);
                 stepped = true;
             }
             
@@ -91,8 +91,8 @@ SimulateGame(Input *input, f32 dt){
             
             if (sin(bobbing) < -0.80 && !stepped) {
                 if (mapFloor[playerGridPY * mapX + (int)((playerP.x)/64)] == 1)
-                    ma_engine_play_sound(&engine, "grassstep.mp3", NULL);
-                else ma_engine_play_sound(&engine, "concrete.mp3", NULL);
+                    PlayAudio(grassstep);
+                else PlayAudio(concrete);
                 stepped = true;
             }
             
@@ -105,11 +105,11 @@ SimulateGame(Input *input, f32 dt){
             
             if (mapWalls[playerGridPY * mapX + (int)((playerP.x + xReach)/64)] == 7) {
                 mapWalls[playerGridPY * mapX + (int)((playerP.x + xReach)/64)] = 0; 
-                ma_engine_play_sound(&engine, "door.mp3", NULL);
+                PlayAudio(door);
             }
             if (mapWalls[playerGridPX + (int)(mapY - (playerP.y + yReach)/64) * mapX] == 7) {
                 mapWalls[playerGridPX + (int)(mapY - (playerP.y + yReach)/64) * mapX] = 0; 
-                ma_engine_play_sound(&engine, "door.mp3", NULL);
+                PlayAudio(door);
             }
         }
     }
