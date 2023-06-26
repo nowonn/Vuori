@@ -57,8 +57,8 @@ SimulateGame(Input *input, f32 dt){
         if (IsDown(BUTTON_DOWN) || Pressed(BUTTON_DOWN)) {
             if (framesToMoveBack == 5) framesToMoveBack++;
             else if (framesToMoveBack < 5) framesToMoveBack += 2;
-            if (bobbing < 2*PI) bobbing += speed/4 * dt;
-            else bobbing -= 2*PI;
+            if (bobbing > 0) bobbing -= speed/4 * dt;
+            else bobbing += 2*PI;
         }
         
         if (sin(bobbing) > 0) stepped = false;
