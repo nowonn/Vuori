@@ -18,7 +18,8 @@ int renderDistance = 16;
 int fogDist = 512;
 f32 bobbing = 0;
 b32 stepped = false;
-f32 brightness = 0.6;
+f32 brightness = 0.6, timer = 0;
+b32 playingAudio = false;
 
 internal void
 SimulateGame(Input *input, f32 dt){
@@ -64,10 +65,10 @@ SimulateGame(Input *input, f32 dt){
         if (sin(bobbing) > 0) stepped = false;
         
         if (framesToMove > 0){ //Add acceleration :D
-            if (mapWalls[playerGridPY * mapX + (int)((playerP.x + xO)/64)] == 0) {
+            if (mapWalls[playerGridPY * mapX + (int)((playerP.x + xO)/64)] == 0 || mapWalls[playerGridPY * mapX + (int)((playerP.x + xO)/64)] > 50) {
                 playerP.x += playerDP.x * dt * speed * pow(accel, framesToMove);
             } // ^ These if statements check if there's a wall in front of you v
-            if (mapWalls[(int)(mapY - (playerP.y + yO)/64) * mapX + playerGridPX] == 0) {
+            if (mapWalls[(int)(mapY - (playerP.y + yO)/64) * mapX + playerGridPX] == 0 || mapWalls[(int)(mapY - (playerP.y + yO)/64) * mapX + playerGridPX] > 50) {
                 playerP.y += playerDP.y * dt * speed * pow(accel, framesToMove);
             }
             
@@ -82,10 +83,11 @@ SimulateGame(Input *input, f32 dt){
         }
         
         if (framesToMoveBack > 0){ //Super smart way to do it, yeah I know B)
-            if (mapWalls[playerGridPY * mapX + (int)((playerP.x - xO)/64)] == 0) {
+            if (mapWalls[playerGridPY * mapX + (int)((playerP.x - xO)/64)] == 0 || mapWalls[playerGridPY * mapX + (int)((playerP.x - xO)/64)] > 50) {
                 playerP.x -= playerDP.x * dt * speed * pow(accel, framesToMoveBack);
             }
-            if (mapWalls[(int)(mapY - (playerP.y - yO)/64) * mapX + playerGridPX] == 0) {
+            if (mapWalls[(int)(mapY - (playerP.y - yO)/64) * mapX + playerGridPX] == 0 ||
+                mapWalls[(int)(mapY - (playerP.y - yO)/64) * mapX + playerGridPX] > 50) {
                 playerP.y -= playerDP.y * dt * speed * pow(accel, framesToMoveBack);
             }
             
@@ -191,7 +193,7 @@ SimulateGame(Input *input, f32 dt){
             my = (int)(rayY) >> 6;
             mp = (mapY - 1 - my) * mapX + mx;
             
-            if (mp > 0 && mp < mapX*mapY && mapWalls[mp] > 0) {
+            if (mp > 0 && mp < mapX*mapY && mapWalls[mp] > 0 && mapWalls[mp] < 50) {
                 hMapTexture = mapWalls[mp] - 1;
                 dof = renderDistance;
                 if (mapWalls[mp] == 7){ rayX += xOffset/3; rayY += yOffset/3; }
@@ -235,7 +237,7 @@ SimulateGame(Input *input, f32 dt){
             my = (int)(rayY) >> 6;
             mp = (mapY - 1 - my) * mapX + mx;
             
-            if (mp > 0 && mp < mapX*mapY && mapWalls[mp] > 0) {
+            if (mp > 0 && mp < mapX*mapY && mapWalls[mp] > 0 && mapWalls[mp] < 50) {
                 vMapTexture = mapWalls[mp] - 1;
                 dof = renderDistance;
                 if (mapWalls[mp] == 7){ rayX += xOffset/3; rayY += yOffset/3; }
@@ -268,7 +270,7 @@ SimulateGame(Input *input, f32 dt){
             if (shade < 0 || floorD * 2 >= fogDist) shade = 0;
             
             int mapValue;
-            if ((int)(textureX/32.0) >= mapX || (int)(textureY/32.0) >= mapY || (int)(textureX/32.0) < 0 || (int)(textureY/32.0) < 0){
+            if ((int)(textureX/32.0) >= mapX || (int)(textureY/32.0) >= mapY || (int)(textureX/32.0) < 0 || (int)(textureY/32.0) < 0 || mapFloor[(int)(textureY/32.0)*mapX + (int)(textureX/32.0)] > 50){
                 mapValue = 1024;
                 textureX += mapS*mapX;
                 textureY += mapS*mapY;
@@ -288,6 +290,7 @@ SimulateGame(Input *input, f32 dt){
             if (floorD < renderDistance * mapS/2) DrawRectInPixels((rayAmount - ray - 1) * lineWidth, y - 110, (rayAmount - ray) * lineWidth, y + 1 - 110, floorColor);
             
             mapValue = mapCeiling[(int)(textureY/32.0)*mapX + (int)(textureX/32.0)] * 1024;
+            if (mapCeiling[(int)(textureY/32.0)*mapX + (int)(textureX/32.0)] > 50) mapValue = 0;
             pixel = (((int)(textureY)&31) * 32 + ((int)(textureX)&31)) * 3 + mapValue * 3;
             red = allTextures[pixel] * shade;
             green = allTextures[pixel + 1] * shade;
@@ -350,19 +353,30 @@ SimulateGame(Input *input, f32 dt){
     
     DrawSprites(playerP, playerAngle, fogDist, dt, bobbing, brightness);
     
-    if (mainMenuState){
-        DrawOnScreen(credits, 358, 64, 20, 520, 1);
-        DrawOnScreen(title, 234, 72, 363, 100, 1);
-        if ((int)(playerAngle*8)%3) DrawOnScreen(start, 640, 48, 160, 380, 1);
-    }
-    
     if (hp < 3){
-        //DrawRectInPixels(0, 0, 960, 50 * (3 - hp), 0);
         DrawRectInPixels(0, 0, 120 * (3 - hp), 640, 0);
         DrawRectInPixels(960 - 120 * (3 - hp) - 15, 0, 960, 640, 0);
-        //DrawRectInPixels(0, 640 - 50 * (3 - hp) - 40, 960, 640, 0);
     }
     
-    //int i;
-    //for(i = 0; i < hp; i++) DrawRectInPixels(10 + i*40, 10, 40 + i*40, 40, 0xff0000);
+    if (mainMenuState){
+        DrawOnScreen(credits, 358, 64, 20, 520, 1, 1);
+        DrawOnScreen(title, 234, 72, 310, 100, 1, 1.5);
+        if ((int)(playerAngle*8)%3) DrawOnScreen(start, 640, 48, 160, 380, 1, 1);
+    }
+    
+    if(gameFinish){
+        if (items >= 5){
+            if (!playingAudio) PlayAudio(victory);
+            playingAudio = true;
+            DrawOnScreen(won, 480, 320, 0, 0, 1, 2);
+        } else {
+            if (!playingAudio) PlayAudio(fail);
+            playingAudio = true;
+            DrawOnScreen(finishBad, 480, 320, 0, 0, 0, 2);
+            if (timer > 9) DrawOnScreen(finishBad, 480, 320, 20, 2, 0.6, 1.88);
+            if (timer > 3) DrawOnScreen(escaped, 214, 47, 250, 120, 1, 1.88);
+            if (timer > 6) DrawOnScreen(but, 312, 70, 170, 240, 1, 1.88);
+            timer += dt;
+        }
+    }
 };

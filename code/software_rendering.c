@@ -40,7 +40,7 @@ DrawMap(){
 }
 
 internal void
-DrawOnScreen(int imageMap[], int imgW, int imgH, int startingX, int startingY, f32 shade){
+DrawOnScreen(int imageMap[], int imgW, int imgH, int startingX, int startingY, f32 shade, f32 pSize){
     int imgX, imgY;
     for (imgY = 0; imgY < imgH; imgY++){
         for (imgX = 0; imgX < imgW; imgX++){
@@ -51,8 +51,10 @@ DrawOnScreen(int imageMap[], int imgW, int imgH, int startingX, int startingY, f
             
             u32 color = createRGB(red, green, blue);
             
-            if (color != 0xff00ff) DrawRectInPixels(startingX + imgX, startingY + imgY,
-                                                    startingX + imgX + 1, startingY + imgY + 1,
+            if (color != 0xff00ff) DrawRectInPixels(startingX + imgX * pSize,
+                                                    startingY + imgY * pSize,
+                                                    startingX + (imgX + 1) * pSize,
+                                                    startingY + (imgY + 1) * pSize,
                                                     color);
         }
     }
@@ -63,30 +65,76 @@ DrawSprites(v2 playerP, f32 playerAngle, int fogDist, f32 dt, f32 bobbing, f32 b
     int x, y, sprite;
     b32 isTransparent = false;
     
-    for(sprite = 0; sprite < 400; sprite++){
-        if (sp[sprite].type == 0 && sp[sprite].exists == 1){ 
+    for(sprite = 0; sprite < 420; sprite++){
+        if (playerAngle > PI && playerAngle < 2 * PI) sprite = 419 - sprite;
+        if (sp[sprite].exists == 1){ 
             if (playerP.x < sp[sprite].x + 30 && playerP.x > sp[sprite].x - 30 && playerP.y < sp[sprite].y + 30 && playerP.y > sp[sprite].y - 30) {
-                if (sprite == 384){
-                    memcpy(mapWalls, mapWalls2, sizeof(mapWalls));
-                    memcpy(mapFloor, mapFloor2, sizeof(mapFloor));
-                    memcpy(mapCeiling, mapCeiling2, sizeof(mapCeiling));
-                    sp[385].exists = true;
-                    sp[386].exists = true;
-                    CreateSprites();
+                if (sp[sprite].type == 0){
+                    PlayAudio(key);
+                    switch(sprite){
+                        case 384: 
+                        memcpy(mapWalls, mapWalls2, sizeof(mapWalls));
+                        memcpy(mapFloor, mapFloor2, sizeof(mapFloor));
+                        memcpy(mapCeiling, mapCeiling2, sizeof(mapCeiling));
+                        sp[385].exists = true;
+                        sp[386].exists = true;
+                        sp[413].exists = false;
+                        sp[414].exists = true;
+                        CreateSprites(); break;
+                        case 385: 
+                        mapWalls[109*128+107] = 7; break;
+                        case 386:
+                        memcpy(mapWalls, mapWalls3, sizeof(mapWalls));
+                        memcpy(mapFloor, mapFloor3, sizeof(mapFloor));
+                        memcpy(mapCeiling, mapCeiling3, sizeof(mapCeiling));
+                        sp[398].exists = true;
+                        sp[414].exists = false;
+                        sp[415].exists = true;
+                        CreateSprites(); break;
+                        case 398:
+                        memcpy(mapWalls, mapWalls4, sizeof(mapWalls));
+                        memcpy(mapFloor, mapFloor4, sizeof(mapFloor));
+                        memcpy(mapCeiling, mapCeiling4, sizeof(mapCeiling));
+                        sp[399].exists = true;
+                        sp[415].exists = false;
+                        sp[416].exists = true;
+                        CreateSprites(); break;
+                        case 399:
+                        for (int k = 0; k < 128*128; k++){
+                            if (mapWalls[k] == 3) mapWalls[k] = 0;
+                            if (mapFloor[k] == 4) mapFloor[k] = 0;
+                            if (mapCeiling[k] == 4) mapCeiling[k] = 0;
+                            
+                            if (mapWalls[k] > 50) mapWalls[k] -= 50;
+                            if (mapFloor[k] > 50) mapFloor[k] -= 50;
+                            if (mapCeiling[k] > 50) mapCeiling[k] -= 50;
+                        }
+                        sp[400].exists = true;
+                        sp[416].exists = false;
+                        break;
+                        case 400:
+                        memcpy(mapWalls, mapWalls5, sizeof(mapWalls));
+                        memcpy(mapFloor, mapFloor5, sizeof(mapFloor));
+                        memcpy(mapCeiling, mapCeiling5, sizeof(mapCeiling));
+                        sp[401].exists = true;
+                        sp[417].exists = true;
+                        CreateSprites(); break;
+                        case 401:
+                        gameFinish = true; gameState = false; break;
+                    }
+                    sp[sprite].exists = false;
+                } else if (sp[sprite].type == 3 && hp < 3){
+                    PlayAudio(heal); hp++;
+                    sp[sprite].exists = false;
+                } else if (sp[sprite].type == 4){
+                    PlayAudio(secret);
+                    items++;
+                    sp[sprite].exists = false;
                 }
-                if (sprite == 385){
-                    mapWalls[109*128+107] = 7;
-                }
-                if (sprite == 386){
-                    memcpy(mapWalls, mapWalls3, sizeof(mapWalls));
-                    memcpy(mapFloor, mapFloor3, sizeof(mapFloor));
-                    memcpy(mapCeiling, mapCeiling3, sizeof(mapCeiling));
-                    CreateSprites();
-                }
-                sp[sprite].exists = false;
             }
         }
         
+        b32 isVisible = false;
         f32 spriteX = sp[sprite].x - playerP.x;
         f32 spriteY = sp[sprite].y - playerP.y;
         f32 spriteZ = sp[sprite].z;
@@ -114,6 +162,7 @@ DrawSprites(v2 playerP, f32 playerAngle, int fogDist, f32 dt, f32 bobbing, f32 b
                 for(y = 0; y < scale; y++){
                     if (x > 0 && x < 120 && b < depth[x]){
                         isTransparent = false;
+                        isVisible = true;
                         int pixel = ((int)textureY*32 + (int)textureX) * 3 + sp[sprite].texture * 1024 * 3;
                         if (allSprites[pixel] + allSprites[pixel + 1] +  allSprites[pixel + 2] == 765 || shade == 0) isTransparent = true;
                         int red = allSprites[pixel] * shade;
@@ -135,7 +184,8 @@ DrawSprites(v2 playerP, f32 playerAngle, int fogDist, f32 dt, f32 bobbing, f32 b
                 textureX -= xStep; if (textureX < 0) textureX = 0;
             }
             
-            if (sp[sprite].type == 2 && sp[sprite].exists == 1) {
+            if (sp[sprite].type == 2 && sp[sprite].exists == 1 && isVisible) {
+                PlayAudio(follow);
                 int gridX = (int)sp[sprite].x >> 6, gridY = mapY - 1 - ((int)sp[sprite].y >> 6);
                 int gridXPlus = ((int)sp[sprite].x + 5) >> 6;
                 int gridYPlus = mapY - 1 - (((int)sp[sprite].y + 5) >> 6);
@@ -148,11 +198,12 @@ DrawSprites(v2 playerP, f32 playerAngle, int fogDist, f32 dt, f32 bobbing, f32 b
                 if (sp[sprite].y < playerP.y && mapWalls[gridYPlus * mapX + gridX] == 0) sp[sprite].y += (playerP.y - sp[sprite].y) / (1 + abs(dist(sp[sprite].x, sp[sprite].y, playerP.x, playerP.y, 0))) * dt * 125;
                 if (playerP.x < sp[sprite].x + 20 && playerP.x > sp[sprite].x - 20 && playerP.y < sp[sprite].y + 20 && playerP.y > sp[sprite].y - 20 && !tookDmg) {
                     hp--;
-                    ma_engine_play_sound(&engine, "ghost.mp3", NULL);
+                    PlayAudio(ghost);
                     sp[sprite].exists = 0;
                     if (hp < 1) running = false;
                 }
             }
         }
+        if (playerAngle > PI && playerAngle < 2 * PI) sprite = 419 - sprite;
     }
 }

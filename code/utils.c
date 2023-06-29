@@ -10,14 +10,12 @@ typedef uint64_t u64;
 typedef float f32;
 typedef double f64;
 
-typedef int b32;
-
-#define true 1;
-#define false 0;
+typedef bool b32;
 
 #define global_variable static;
 #define internal static;
 
 global_variable b32 running = true;
 global_variable b32 gameState = false;
+global_variable b32 gameFinish = false;
 global_variable b32 mainMenuState = true;

@@ -1,6 +1,6 @@
 int depth[120];//120 = rayAmount
 int mapX = 128, mapY = 128, mapS = 64;
-int hp = 3;
+int hp = 3, items = 0;
 
 internal void
 CreateSprites(){
