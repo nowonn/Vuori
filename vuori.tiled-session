@@ -1,0 +1,116 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "assets/tmj/map4.tmj",
+    "expandedProjectPaths": [
+        ".",
+        "assets",
+        "assets/tmj"
+    ],
+    "fileStates": {
+        "": {
+            "scaleInDock": 1
+        },
+        "#textures": {
+            "scaleInDock": 1
+        },
+        "assets/tmj/map1.tmj": {
+            "scale": 0.125,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 1984,
+                "y": 2440
+            }
+        },
+        "assets/tmj/map1.tmj#sprites": {
+            "scaleInDock": 1
+        },
+        "assets/tmj/map1.tmj#textures": {
+            "scaleInDock": 1
+        },
+        "assets/tmj/map2.tmj": {
+            "scale": 0.25,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 512,
+                "y": 2568
+            }
+        },
+        "assets/tmj/map2.tmj#textures": {
+            "scaleInDock": 1
+        },
+        "assets/tmj/map3.tmj": {
+            "scale": 0.33,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 678.7878787878788,
+                "y": 2993.939393939394
+            }
+        },
+        "assets/tmj/map3.tmj#textures": {
+            "scaleInDock": 1
+        },
+        "assets/tmj/map4.tmj": {
+            "scale": 0.25,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 3740,
+                "y": 1132
+            }
+        },
+        "assets/tmj/map4.tmj#textures": {
+            "scaleInDock": 1
+        },
+        "assets/tmj/map5.tmj": {
+            "scale": 0.33,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 3127.272727272727,
+                "y": 1533.3333333333335
+            }
+        },
+        "assets/tmj/map5.tmj#textures": {
+            "scaleInDock": 1
+        },
+        "assets/tmj/trees.tmj": {
+            "scale": 0.268115234375,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 1021.9486432343834,
+                "y": 1021.9486432343834
+            }
+        },
+        "assets/tmj/trees.tmj#sprites": {
+            "scaleInDock": 1
+        },
+        "assets/tmj/trees.tmj#textures": {
+            "scaleInDock": 1
+        }
+    },
+    "last.imagePath": "C:/Users/Kibado/Desktop/newfixvuori/Vuori/assets/png",
+    "map.height": 64,
+    "map.lastUsedFormat": "json",
+    "map.layerDataFormat": null,
+    "map.renderOrder": null,
+    "map.width": 64,
+    "openFiles": [
+        "assets/tmj/map1.tmj",
+        "assets/tmj/map2.tmj",
+        "assets/tmj/map3.tmj",
+        "assets/tmj/map4.tmj",
+        "assets/tmj/map5.tmj"
+    ],
+    "project": "vuori.tiled-project",
+    "property.type": "float",
+    "recentFiles": [
+        "assets/tmj/map1.tmj",
+        "assets/tmj/map2.tmj",
+        "assets/tmj/map3.tmj",
+        "assets/tmj/map5.tmj",
+        "assets/tmj/map4.tmj",
+        "assets/tmj/trees.tmj"
+    ],
+    "tileset.embedInMap": true
+}
