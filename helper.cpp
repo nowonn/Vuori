@@ -1,6 +1,3 @@
-// TODO: make helper create new subdir (match all assets dir in rc subdirs)
-// e.g.: if a new dir assets/potato was created
-// then create a rc/assets/potato matching that
 #include <iostream>
 #include <fstream>
 #include <filesystem>
@@ -119,6 +116,11 @@ void generateMakefile(const std::string& rootDir, bool shouldRemakeAssets) {
 
     makefileStream << makefile[1];
 
+    if (!std::filesystem::is_directory("rc") || !std::filesystem::exists("rc"))
+        std::filesystem::create_directory("rc");
+    if (!std::filesystem::is_directory("rc\\" + rootDir) || !std::filesystem::exists("rc\\" + rootDir))
+        std::filesystem::create_directory("rc\\" + rootDir);
+
     std::set<std::string> all_asset_files, special_files, subDirs;
     for (const auto& entry : std::filesystem::directory_iterator(rootDir)) {
         if (std::filesystem::is_directory(entry)) {
@@ -153,6 +155,8 @@ void generateMakefile(const std::string& rootDir, bool shouldRemakeAssets) {
                                    << rootDir << "\\" << subdirName << "\\" << fileName << std::endl;
 
                     std::string rcFileName = "rc\\" + rootDir + "\\" + subdirName + "\\" + stem + ".rc";
+                    if (!std::filesystem::is_directory("rc\\" + rootDir + "\\" + subdirName) || !std::filesystem::exists("rc\\" + rootDir + "\\" + subdirName))
+                        std::filesystem::create_directory("rc\\" + rootDir + "\\" + subdirName);
 
                     std::ofstream rcFile(rcFileName);
                     STREAM_PANIC(rcFile);
