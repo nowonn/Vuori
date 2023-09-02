@@ -1,0 +1,6 @@
+INCLUDE(map1)
+INCLUDE(map2)
+INCLUDE(map3)
+INCLUDE(map4)
+INCLUDE(map5)
+INCLUDE(trees)
